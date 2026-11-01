@@ -1,7 +1,335 @@
 {
   "version" : 1,
-  "name" : "AgentModlerWorkspace",
-  "nodes" : [ ],
-  "edges" : [ ],
+  "name" : "Jira Triage Graph",
+  "nodes" : [ {
+    "id" : "harness",
+    "type" : "harness",
+    "position" : {
+      "x" : 180.123046875,
+      "y" : 133.095703125
+    },
+    "data" : {
+      "name" : "jira-triage-graph",
+      "backend" : "spring-boot",
+      "port" : 8080,
+      "dockerBaseImage" : "eclipse-temurin:21-jre",
+      "width" : 1300,
+      "height" : 550
+    },
+    "parent" : null
+  }, {
+    "id" : "node-jira-finder",
+    "type" : "builtin-tool",
+    "position" : {
+      "x" : 260.123046875,
+      "y" : 213.095703125
+    },
+    "data" : {
+      "toolType" : "jira",
+      "baseUrl" : "https://arekczarnik.atlassian.net"
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "node-jira-rater",
+    "type" : "builtin-tool",
+    "position" : {
+      "x" : 260.123046875,
+      "y" : 463.095703125
+    },
+    "data" : {
+      "toolType" : "jira",
+      "baseUrl" : "https://arekczarnik.atlassian.net"
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "agent-finder",
+    "type" : "agent",
+    "position" : {
+      "x" : 580.123046875,
+      "y" : 263.095703125
+    },
+    "data" : {
+      "name" : "TicketFinder",
+      "systemPrompt" : "Du bist ein Jira-Assistent. Die Nachricht nennt ein Projekt. Suche mit searchIssues alle offenen Tickets dieses Projekts (JQL: project = PROJEKTKEY AND statusCategory != Done ORDER BY created ASC) und lies jedes Ticket mit getIssue.\nDeine abschliessende Antwort ist ein JSON-Array mit einem Objekt pro Ticket, genau in dieser Form:\n[{\"key\": \"KAN-1\", \"titel\": \"...\", \"beschreibung\": \"...\"}, {\"key\": \"KAN-2\", \"titel\": \"...\", \"beschreibung\": \"...\"}]\nEckige Klammern aussen, kein Markdown-Codeblock. Fehlt eine Beschreibung, schreibe \"\".",
+      "modelProvider" : "ollama",
+      "modelId" : "qwen3.5:9b",
+      "temperature" : 0,
+      "ollamaThink" : false,
+      "maxIterations" : 50
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "agent-rater",
+    "type" : "graph-agent",
+    "position" : {
+      "x" : 880.123046875,
+      "y" : 363.095703125
+    },
+    "data" : {
+      "name" : "TicketRater",
+      "description" : "Bewertet ein Jira-Ticket (JSON) per Decision und schreibt die Bewertung als Kommentar.",
+      "systemPrompt" : "Du bist ein Jira-Assistent. Die Eingabe ist ein Jira-Ticket als JSON-Objekt mit key, titel und beschreibung. Beginnt eine Nachricht mit \"Bewertung:\", schreibe mit addComment genau einen Kommentar in das genannte Ticket. Der Kommentar beginnt mit \"[KI-Bewertung] Wichtigkeit: <Stufe>\" und enthaelt danach eine Begruendung in zwei bis drei Saetzen auf Basis der Beschreibung. Antworte danach nur mit: OK <KEY>: <Stufe>",
+      "modelProvider" : "ollama",
+      "modelId" : "qwen3.5:9b",
+      "temperature" : 0,
+      "maxIterations" : 50,
+      "ollamaThink" : false,
+      "strategyNodes" : [ {
+        "id" : "sn-start",
+        "type" : "node-start",
+        "position" : {
+          "x" : 0,
+          "y" : 300
+        },
+        "data" : { }
+      }, {
+        "id" : "sn-rate",
+        "type" : "node-decision",
+        "position" : {
+          "x" : 240,
+          "y" : 300
+        },
+        "data" : {
+          "label" : "Wie wichtig?",
+          "decisionKind" : "score",
+          "decisionQuestion" : "Wie wichtig ist dieses Jira-Ticket? Beruecksichtige Kundenauswirkung, Anzahl betroffener Nutzer, Sicherheits- und Datenrisiken sowie Dringlichkeit laut Beschreibung.",
+          "decisionOptions" : [ {
+            "name" : "Niedrig"
+          }, {
+            "name" : "Mittel"
+          }, {
+            "name" : "Hoch"
+          } ]
+        }
+      }, {
+        "id" : "sn-low",
+        "type" : "node-custom",
+        "position" : {
+          "x" : 1000,
+          "y" : 160
+        },
+        "data" : {
+          "label" : "commentLow",
+          "inputType" : "String",
+          "outputType" : "String",
+          "body" : "\"Bewertung: Niedrig\\nSchreibe jetzt den [KI-Bewertung]-Kommentar mit Wichtigkeit Niedrig in dieses Ticket:\\n\\n\" + input"
+        }
+      }, {
+        "id" : "sn-mid",
+        "type" : "node-custom",
+        "position" : {
+          "x" : 1000,
+          "y" : 320
+        },
+        "data" : {
+          "label" : "commentMedium",
+          "inputType" : "String",
+          "outputType" : "String",
+          "body" : "\"Bewertung: Mittel\\nSchreibe jetzt den [KI-Bewertung]-Kommentar mit Wichtigkeit Mittel in dieses Ticket:\\n\\n\" + input"
+        }
+      }, {
+        "id" : "sn-high",
+        "type" : "node-custom",
+        "position" : {
+          "x" : 1000,
+          "y" : 480
+        },
+        "data" : {
+          "label" : "commentHigh",
+          "inputType" : "String",
+          "outputType" : "String",
+          "body" : "\"Bewertung: Hoch\\nSchreibe jetzt den [KI-Bewertung]-Kommentar mit Wichtigkeit Hoch in dieses Ticket:\\n\\n\" + input"
+        }
+      }, {
+        "id" : "sn-write",
+        "type" : "node-subgraph",
+        "position" : {
+          "x" : 1260,
+          "y" : 320
+        },
+        "data" : {
+          "label" : "writeComment",
+          "subgraphName" : "writeComment",
+          "subgraphInputType" : "String",
+          "subgraphOutputType" : "String",
+          "subgraphToolSelection" : "SPECIFIC",
+          "subgraphTools" : [ "addComment" ],
+          "subgraphNodes" : [ {
+            "id" : "w-start",
+            "type" : "node-start",
+            "position" : {
+              "x" : 0,
+              "y" : 200
+            },
+            "data" : { }
+          }, {
+            "id" : "w-llm",
+            "type" : "node-llm-request",
+            "position" : {
+              "x" : 220,
+              "y" : 200
+            },
+            "data" : {
+              "label" : "commentLlm"
+            }
+          }, {
+            "id" : "w-exec",
+            "type" : "node-execute-tool",
+            "position" : {
+              "x" : 460,
+              "y" : 60
+            },
+            "data" : {
+              "label" : "execJiraComment",
+              "toolName" : "jira"
+            }
+          }, {
+            "id" : "w-send",
+            "type" : "node-llm-send-tool-result",
+            "position" : {
+              "x" : 700,
+              "y" : 60
+            },
+            "data" : {
+              "label" : "sendJiraCommentResult"
+            }
+          }, {
+            "id" : "w-finish",
+            "type" : "node-finish",
+            "position" : {
+              "x" : 700,
+              "y" : 300
+            },
+            "data" : { }
+          } ],
+          "subgraphEdges" : [ {
+            "id" : "w-e1",
+            "source" : "w-start",
+            "target" : "w-llm",
+            "edgeType" : "onCondition"
+          }, {
+            "id" : "w-e2",
+            "source" : "w-llm",
+            "target" : "w-exec",
+            "edgeType" : "onToolCall"
+          }, {
+            "id" : "w-e3",
+            "source" : "w-llm",
+            "target" : "w-finish",
+            "edgeType" : "onAssistantMessage"
+          }, {
+            "id" : "w-e4",
+            "source" : "w-exec",
+            "target" : "w-send",
+            "edgeType" : "onCondition"
+          }, {
+            "id" : "w-e5",
+            "source" : "w-send",
+            "target" : "w-exec",
+            "edgeType" : "onToolCall"
+          }, {
+            "id" : "w-e6",
+            "source" : "w-send",
+            "target" : "w-finish",
+            "edgeType" : "onAssistantMessage"
+          } ]
+        }
+      }, {
+        "id" : "sn-finish",
+        "type" : "node-finish",
+        "position" : {
+          "x" : 1520,
+          "y" : 320
+        },
+        "data" : { }
+      } ],
+      "strategyEdges" : [ {
+        "id" : "se-1",
+        "source" : "sn-start",
+        "target" : "sn-rate",
+        "edgeType" : "onCondition"
+      }, {
+        "id" : "se-5",
+        "source" : "sn-rate",
+        "target" : "sn-low",
+        "edgeType" : "onDecision",
+        "decisionValues" : [ "Niedrig" ]
+      }, {
+        "id" : "se-6",
+        "source" : "sn-rate",
+        "target" : "sn-mid",
+        "edgeType" : "onDecision",
+        "decisionValues" : [ "Mittel" ]
+      }, {
+        "id" : "se-7",
+        "source" : "sn-rate",
+        "target" : "sn-high",
+        "edgeType" : "onDecision",
+        "decisionValues" : [ "Hoch" ]
+      }, {
+        "id" : "se-8",
+        "source" : "sn-low",
+        "target" : "sn-write",
+        "edgeType" : "onCondition"
+      }, {
+        "id" : "se-9",
+        "source" : "sn-mid",
+        "target" : "sn-write",
+        "edgeType" : "onCondition"
+      }, {
+        "id" : "se-10",
+        "source" : "sn-high",
+        "target" : "sn-write",
+        "edgeType" : "onCondition"
+      }, {
+        "id" : "se-11",
+        "source" : "sn-write",
+        "target" : "sn-finish",
+        "edgeType" : "onCondition"
+      } ]
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "agent-reporter",
+    "type" : "agent",
+    "position" : {
+      "x" : 1180.123046875,
+      "y" : 363.095703125
+    },
+    "data" : {
+      "name" : "Reporter",
+      "systemPrompt" : "Du bekommst ein JSON-Array mit einem Eintrag je Ticket: {input, decisions, result oder error}. Schreibe einen kurzen deutschen Bericht: pro Ticket der Key, die Wichtigkeitsstufe (lies sie aus result im Format \"OK <KEY>: <Stufe>\") und, falls vorhanden, der Fehler.",
+      "modelProvider" : "ollama",
+      "modelId" : "qwen3.5:9b",
+      "temperature" : 0,
+      "ollamaThink" : false
+    },
+    "parent" : "harness"
+  } ],
+  "edges" : [ {
+    "id" : "e-jira-finder",
+    "source" : "node-jira-finder",
+    "target" : "agent-finder",
+    "flowKind" : null,
+    "decisionValues" : null
+  }, {
+    "id" : "e-jira-rater",
+    "source" : "node-jira-rater",
+    "target" : "agent-rater",
+    "flowKind" : null,
+    "decisionValues" : null
+  }, {
+    "id" : "e-finder-rater",
+    "source" : "agent-finder",
+    "target" : "agent-rater",
+    "flowKind" : "forEach",
+    "decisionValues" : null
+  }, {
+    "id" : "e-rater-rep",
+    "source" : "agent-rater",
+    "target" : "agent-reporter",
+    "flowKind" : "collect",
+    "decisionValues" : null
+  } ],
   "otelConfig" : null
 }

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jira-triage-graph
+  labels:
+    app: jira-triage-graph
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jira-triage-graph
+  template:
+    metadata:
+      labels:
+        app: jira-triage-graph
+    spec:
+      containers:
+        - name: jira-triage-graph
+          image: jira-triage-graph:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: jira-triage-graph-secrets
+                optional: true
+          env:
+            - name: OLLAMA_BASE_URL
+              value: "http://ollama:11434"
