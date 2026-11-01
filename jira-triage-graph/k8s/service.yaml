@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jira-triage-graph
+  labels:
+    app: jira-triage-graph
+spec:
+  type: ClusterIP
+  selector:
+    app: jira-triage-graph
+  ports:
+    - name: port-8080
+      port: 8080
+      targetPort: 8080
