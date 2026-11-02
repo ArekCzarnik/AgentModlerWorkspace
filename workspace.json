@@ -14,7 +14,12 @@
       "port" : 8080,
       "dockerBaseImage" : "eclipse-temurin:21-jre",
       "width" : 1120,
-      "height" : 1040
+      "height" : 1040,
+      "otelConfig" : {
+        "enabled" : true,
+        "exporterType" : "http",
+        "verbose" : false
+      }
     },
     "parent" : null
   }, {
