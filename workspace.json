@@ -19,6 +19,12 @@
         "enabled" : false,
         "exporterType" : "http",
         "verbose" : false
+      },
+      "deployConfig" : {
+        "namespace" : "agentweaver",
+        "registry" : "registry.k3s.home",
+        "ollamaUrl" : "",
+        "replicas" : 1
       }
     },
     "parent" : null
