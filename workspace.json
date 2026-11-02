@@ -24,7 +24,8 @@
         "namespace" : "agentweaver",
         "registry" : "registry.k3s.home",
         "ollamaUrl" : "",
-        "replicas" : 1
+        "replicas" : 1,
+        "skipTlsVerify" : true
       }
     },
     "parent" : null
