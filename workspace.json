@@ -83,16 +83,16 @@
         "id" : "sn-start",
         "type" : "node-start",
         "position" : {
-          "x" : 0,
-          "y" : 300
+          "x" : 239.58984375,
+          "y" : 302.466796875
         },
         "data" : { }
       }, {
         "id" : "sn-rate",
         "type" : "node-decision",
         "position" : {
-          "x" : 240,
-          "y" : 300
+          "x" : 447.7265625,
+          "y" : 299.314453125
         },
         "data" : {
           "label" : "Wie wichtig?",
@@ -110,8 +110,8 @@
         "id" : "sn-low",
         "type" : "node-custom",
         "position" : {
-          "x" : 1000,
-          "y" : 160
+          "x" : 752.6927002012483,
+          "y" : 173.69689879058564
         },
         "data" : {
           "label" : "commentLow",
@@ -123,8 +123,8 @@
         "id" : "sn-mid",
         "type" : "node-custom",
         "position" : {
-          "x" : 1000,
-          "y" : 320
+          "x" : 754.7517801988391,
+          "y" : 318.4670285480491
         },
         "data" : {
           "label" : "commentMedium",
@@ -136,8 +136,8 @@
         "id" : "sn-high",
         "type" : "node-custom",
         "position" : {
-          "x" : 1000,
-          "y" : 480
+          "x" : 755.5137305063176,
+          "y" : 470.7840296143071
         },
         "data" : {
           "label" : "commentHigh",
@@ -149,8 +149,8 @@
         "id" : "sn-write",
         "type" : "node-subgraph",
         "position" : {
-          "x" : 1260,
-          "y" : 320
+          "x" : 1086.6200217006551,
+          "y" : 321.20642132017434
         },
         "data" : {
           "label" : "writeComment",
@@ -243,8 +243,8 @@
         "id" : "sn-finish",
         "type" : "node-finish",
         "position" : {
-          "x" : 1520,
-          "y" : 320
+          "x" : 1393.9697908082505,
+          "y" : 336.9715360153853
         },
         "data" : { }
       } ],
