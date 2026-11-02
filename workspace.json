@@ -5,8 +5,8 @@
     "id" : "harness",
     "type" : "harness",
     "position" : {
-      "x" : -20.0,
-      "y" : -40.0
+      "x" : 278.74734497238416,
+      "y" : -138.82798719329531
     },
     "data" : {
       "name" : "goap-bash-script",
@@ -21,8 +21,8 @@
     "id" : "tool-jira",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 60.0,
-      "y" : 40.0
+      "x" : 358.74734497238416,
+      "y" : -58.827987193295314
     },
     "data" : {
       "toolType" : "jira",
@@ -33,8 +33,8 @@
     "id" : "tool-dev-shell",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 60.0,
-      "y" : 440.0
+      "x" : 358.74734497238416,
+      "y" : 341.1720128067047
     },
     "data" : {
       "toolType" : "shell",
@@ -45,8 +45,8 @@
     "id" : "tool-review-fs",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 60.0,
-      "y" : 640.0
+      "x" : 358.74734497238416,
+      "y" : 541.1720128067047
     },
     "data" : {
       "toolType" : "filesystem"
@@ -56,8 +56,8 @@
     "id" : "tool-review-shell",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 60.0,
-      "y" : 780.0
+      "x" : 358.74734497238416,
+      "y" : 681.1720128067047
     },
     "data" : {
       "toolType" : "shell",
@@ -68,8 +68,8 @@
     "id" : "agent-research",
     "type" : "sub-agent",
     "position" : {
-      "x" : 400.0,
-      "y" : 40.0
+      "x" : 698.7473449723843,
+      "y" : -58.827987193295314
     },
     "data" : {
       "name" : "ResearchAgent",
@@ -88,8 +88,8 @@
     "id" : "agent-developer",
     "type" : "sub-agent",
     "position" : {
-      "x" : 400.0,
-      "y" : 360.0
+      "x" : 698.7473449723843,
+      "y" : 261.1720128067047
     },
     "data" : {
       "name" : "DeveloperAgent",
@@ -108,8 +108,8 @@
     "id" : "agent-review",
     "type" : "sub-agent",
     "position" : {
-      "x" : 400.0,
-      "y" : 700.0
+      "x" : 698.7473449723843,
+      "y" : 601.1720128067047
     },
     "data" : {
       "name" : "ReviewAgent",
@@ -128,8 +128,8 @@
     "id" : "planner",
     "type" : "planner-agent",
     "position" : {
-      "x" : 800.0,
-      "y" : 360.0
+      "x" : 1098.747344972384,
+      "y" : 261.1720128067047
     },
     "data" : {
       "name" : "BashScript",
