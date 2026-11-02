@@ -14,7 +14,14 @@
       "port" : 8080,
       "dockerBaseImage" : "eclipse-temurin:21-jre",
       "width" : 1300,
-      "height" : 550
+      "height" : 550,
+      "deployConfig" : {
+        "namespace" : "agentweaver",
+        "registry" : "registry.k3s.home",
+        "ollamaUrl" : "",
+        "replicas" : 1,
+        "skipTlsVerify" : true
+      }
     },
     "parent" : null
   }, {
