@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capital-expert
+  labels:
+    app: capital-expert
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: capital-expert
+  template:
+    metadata:
+      labels:
+        app: capital-expert
+    spec:
+      containers:
+        - name: capital-expert
+          image: capital-expert:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+            - containerPort: 9101
+          envFrom:
+            - secretRef:
+                name: capital-expert-secrets
+                optional: true
+          env:
+            - name: OLLAMA_BASE_URL
+              value: "http://ollama:11434"
