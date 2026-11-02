@@ -1,35 +1,28 @@
 {
   "version" : 1,
-  "name" : "Jira Triage Graph",
+  "name" : "GOAP Bash Script",
   "nodes" : [ {
     "id" : "harness",
     "type" : "harness",
     "position" : {
-      "x" : 0.0,
-      "y" : -30.0
+      "x" : -33.6875,
+      "y" : -223.708984375
     },
     "data" : {
-      "name" : "jira-triage-graph",
+      "name" : "goap-bash-script",
       "backend" : "spring-boot",
       "port" : 8080,
       "dockerBaseImage" : "eclipse-temurin:21-jre",
-      "width" : 1300,
-      "height" : 550,
-      "deployConfig" : {
-        "namespace" : "agentweaver",
-        "registry" : "registry.k3s.home",
-        "ollamaUrl" : "",
-        "replicas" : 1,
-        "skipTlsVerify" : true
-      }
+      "width" : 1120,
+      "height" : 1040
     },
     "parent" : null
   }, {
-    "id" : "node-jira-finder",
+    "id" : "tool-jira",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 80.0,
-      "y" : 50.0
+      "x" : 46.3125,
+      "y" : -143.708984375
     },
     "data" : {
       "toolType" : "jira",
@@ -37,305 +30,397 @@
     },
     "parent" : "harness"
   }, {
-    "id" : "node-jira-rater",
+    "id" : "tool-dev-shell",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 80.0,
-      "y" : 300.0
+      "x" : 46.3125,
+      "y" : 256.291015625
     },
     "data" : {
-      "toolType" : "jira",
-      "baseUrl" : "https://arekczarnik.atlassian.net"
+      "toolType" : "shell",
+      "workingDir" : "/workspace/sandbox"
     },
     "parent" : "harness"
   }, {
-    "id" : "agent-finder",
-    "type" : "agent",
+    "id" : "tool-review-fs",
+    "type" : "builtin-tool",
     "position" : {
-      "x" : 400.0,
-      "y" : 100.0
+      "x" : 46.3125,
+      "y" : 456.291015625
     },
     "data" : {
-      "name" : "TicketFinder",
-      "systemPrompt" : "Du bist ein Jira-Assistent. Die Nachricht nennt ein Projekt. Suche mit searchIssues alle offenen Tickets dieses Projekts (JQL: project = PROJEKTKEY AND statusCategory != Done ORDER BY created ASC) und lies jedes Ticket mit getIssue.\nDeine abschliessende Antwort ist ein JSON-Array mit einem Objekt pro Ticket, genau in dieser Form:\n[{\"key\": \"KAN-1\", \"titel\": \"...\", \"beschreibung\": \"...\"}, {\"key\": \"KAN-2\", \"titel\": \"...\", \"beschreibung\": \"...\"}]\nEckige Klammern aussen, kein Markdown-Codeblock. Fehlt eine Beschreibung, schreibe \"\".",
+      "toolType" : "filesystem"
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "tool-review-shell",
+    "type" : "builtin-tool",
+    "position" : {
+      "x" : 46.3125,
+      "y" : 596.291015625
+    },
+    "data" : {
+      "toolType" : "shell",
+      "workingDir" : "/workspace/sandbox"
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "agent-research",
+    "type" : "sub-agent",
+    "position" : {
+      "x" : 386.3125,
+      "y" : -143.708984375
+    },
+    "data" : {
+      "name" : "ResearchAgent",
+      "description" : "Liest das Jira-Ticket und bewertet, ob die Anforderungen klar sind.",
+      "systemPrompt" : "Du liest Jira-Tickets mit getIssue und aenderst nichts in Jira.\nBewerte nur, ob Ziel und Akzeptanzkriterien klar erkennbar sind. Deine Antwort beginnt immer mit genau einer dieser Zeilen:\nREQUIREMENTS_OK\nREQUIREMENTS_MISSING\nBei REQUIREMENTS_OK folgen Ticket-Key, Ziel und alle Akzeptanzkriterien woertlich, inklusive Dateiname, Testdaten und Testbefehlen. Bei REQUIREMENTS_MISSING folgt ein Satz, was fehlt. Kein Markdown-Codeblock.",
       "modelProvider" : "ollama",
       "modelId" : "qwen3.5:9b",
       "temperature" : 0,
       "ollamaThink" : false,
-      "maxIterations" : 50
+      "delegationMode" : "automatic",
+      "inputDescription" : "Anfrage mit Ticket-Key",
+      "maxIterations" : 10
     },
     "parent" : "harness"
   }, {
-    "id" : "agent-rater",
-    "type" : "graph-agent",
+    "id" : "agent-developer",
+    "type" : "sub-agent",
     "position" : {
-      "x" : 700.0,
-      "y" : 200.0
+      "x" : 386.3125,
+      "y" : 176.291015625
     },
     "data" : {
-      "name" : "TicketRater",
-      "description" : "Bewertet ein Jira-Ticket (JSON) per Decision und schreibt die Bewertung als Kommentar.",
-      "systemPrompt" : "Du bist ein Jira-Assistent. Die Eingabe ist ein Jira-Ticket als JSON-Objekt mit key, titel und beschreibung. Beginnt eine Nachricht mit \"Bewertung:\", schreibe mit addComment genau einen Kommentar in das genannte Ticket. Der Kommentar beginnt mit \"[KI-Bewertung] Wichtigkeit: <Stufe>\" und enthaelt danach eine Begruendung in zwei bis drei Saetzen auf Basis der Beschreibung. Antworte danach nur mit: OK <KEY>: <Stufe>",
+      "name" : "DeveloperAgent",
+      "description" : "Schreibt das Bash-Skript, testet es und korrigiert es nach Review-Befunden.",
+      "systemPrompt" : "Du bist Bash-Entwickler. Du arbeitest ausschliesslich in /workspace/sandbox; dein einziges Werkzeug ist executeCommand, die Shell laeuft bereits dort, nutze relative Pfade.\nKuendige nie an, was du tun wirst, sondern rufe die Werkzeuge sofort auf. Wiederhole keinen Befehl unveraendert.\nHalte dich genau an die Schritte und das Antwortformat der Aufgabe.",
+      "modelProvider" : "ollama",
+      "modelId" : "arekczarnik/qwen2.5-coder-tools:14b",
+      "temperature" : 0,
+      "ollamaThink" : false,
+      "delegationMode" : "automatic",
+      "inputDescription" : "Anforderungen und gegebenenfalls Review-Befunde",
+      "maxIterations" : 30
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "agent-review",
+    "type" : "sub-agent",
+    "position" : {
+      "x" : 386.3125,
+      "y" : 516.291015625
+    },
+    "data" : {
+      "name" : "ReviewAgent",
+      "description" : "Testet das Skript selbst, gibt es frei oder lehnt es ab und speichert den Bericht.",
+      "systemPrompt" : "Du bist ein strenger Tester. Du arbeitest ausschliesslich in /workspace/sandbox. Die Shell (executeCommand) laeuft bereits dort, nutze relative Pfade. Dateien schreibst du mit __write_file__ und absolutem Pfad unter /workspace/sandbox/.\nKuendige nie an, was du tun wirst, sondern rufe die Werkzeuge sofort auf. Wiederhole keinen Befehl unveraendert.\nBeim Review aenderst du das Skript nicht, fuehrst die Tests selbst aus und beginnst deine Antwort mit genau einer Zeile APPROVED oder REJECTED. Verwende das Wort APPROVED niemals in einer Ablehnung.\nBeim Speichern rufst du zwingend __write_file__ auf. Erst danach antwortest du nur mit SAVED <Pfad>. Ohne Werkzeugaufruf ist nichts gespeichert, dann darfst du niemals SAVED antworten.",
+      "modelProvider" : "ollama",
+      "modelId" : "arekczarnik/qwen2.5-coder-tools:14b",
+      "temperature" : 0,
+      "ollamaThink" : false,
+      "delegationMode" : "automatic",
+      "inputDescription" : "Pruef- oder Speicherauftrag",
+      "maxIterations" : 30
+    },
+    "parent" : "harness"
+  }, {
+    "id" : "planner",
+    "type" : "planner-agent",
+    "position" : {
+      "x" : 786.3125,
+      "y" : 176.291015625
+    },
+    "data" : {
+      "name" : "BashScript",
+      "description" : "Plant per GOAP die Schritte vom Jira-Ticket bis zum getesteten, geprueften Bash-Skript samt Bericht. Voraussetzung: /workspace/sandbox muss vor dem Lauf existieren (mkdir -p /workspace/sandbox), das Schreib-Tool legt keine Ordner an. Developer- und ReviewAgent brauchen: ollama pull arekczarnik/qwen2.5-coder-tools:14b (qwen2.5-coder:14b mit einer Vorlage, die seine ```json-Werkzeugaufrufe fuer Ollama lesbar macht)",
+      "plannerType" : "goap",
       "modelProvider" : "ollama",
       "modelId" : "qwen3.5:9b",
       "temperature" : 0,
-      "maxIterations" : 50,
       "ollamaThink" : false,
-      "strategyNodes" : [ {
-        "id" : "sn-start",
-        "type" : "node-start",
-        "position" : {
-          "x" : 0,
-          "y" : 300
-        },
-        "data" : { }
-      }, {
-        "id" : "sn-rate",
-        "type" : "node-decision",
-        "position" : {
-          "x" : 240,
-          "y" : 300
-        },
-        "data" : {
-          "label" : "Wie wichtig?",
-          "decisionKind" : "score",
-          "decisionQuestion" : "Wie wichtig ist dieses Jira-Ticket? Beruecksichtige Kundenauswirkung, Anzahl betroffener Nutzer, Sicherheits- und Datenrisiken sowie Dringlichkeit laut Beschreibung.",
-          "decisionOptions" : [ {
-            "name" : "Niedrig"
-          }, {
-            "name" : "Mittel"
-          }, {
-            "name" : "Hoch"
-          } ]
-        }
-      }, {
-        "id" : "sn-low",
-        "type" : "node-custom",
-        "position" : {
-          "x" : 1000,
-          "y" : 160
-        },
-        "data" : {
-          "label" : "commentLow",
-          "inputType" : "String",
-          "outputType" : "String",
-          "body" : "\"Bewertung: Niedrig\\nSchreibe jetzt den [KI-Bewertung]-Kommentar mit Wichtigkeit Niedrig in dieses Ticket:\\n\\n\" + input"
-        }
-      }, {
-        "id" : "sn-mid",
-        "type" : "node-custom",
-        "position" : {
-          "x" : 1000,
-          "y" : 320
-        },
-        "data" : {
-          "label" : "commentMedium",
-          "inputType" : "String",
-          "outputType" : "String",
-          "body" : "\"Bewertung: Mittel\\nSchreibe jetzt den [KI-Bewertung]-Kommentar mit Wichtigkeit Mittel in dieses Ticket:\\n\\n\" + input"
-        }
-      }, {
-        "id" : "sn-high",
-        "type" : "node-custom",
-        "position" : {
-          "x" : 1000,
-          "y" : 480
-        },
-        "data" : {
-          "label" : "commentHigh",
-          "inputType" : "String",
-          "outputType" : "String",
-          "body" : "\"Bewertung: Hoch\\nSchreibe jetzt den [KI-Bewertung]-Kommentar mit Wichtigkeit Hoch in dieses Ticket:\\n\\n\" + input"
-        }
-      }, {
-        "id" : "sn-write",
-        "type" : "node-subgraph",
-        "position" : {
-          "x" : 1260,
-          "y" : 320
-        },
-        "data" : {
-          "label" : "writeComment",
-          "subgraphName" : "writeComment",
-          "subgraphInputType" : "String",
-          "subgraphOutputType" : "String",
-          "subgraphToolSelection" : "SPECIFIC",
-          "subgraphTools" : [ "addComment" ],
-          "subgraphNodes" : [ {
-            "id" : "w-start",
-            "type" : "node-start",
-            "position" : {
-              "x" : 0,
-              "y" : 200
-            },
-            "data" : { }
-          }, {
-            "id" : "w-llm",
-            "type" : "node-llm-request",
-            "position" : {
-              "x" : 220,
-              "y" : 200
-            },
-            "data" : {
-              "label" : "commentLlm"
-            }
-          }, {
-            "id" : "w-exec",
-            "type" : "node-execute-tool",
-            "position" : {
-              "x" : 460,
-              "y" : 60
-            },
-            "data" : {
-              "label" : "execJiraComment",
-              "toolName" : "jira"
-            }
-          }, {
-            "id" : "w-send",
-            "type" : "node-llm-send-tool-result",
-            "position" : {
-              "x" : 700,
-              "y" : 60
-            },
-            "data" : {
-              "label" : "sendJiraCommentResult"
-            }
-          }, {
-            "id" : "w-finish",
-            "type" : "node-finish",
-            "position" : {
-              "x" : 700,
-              "y" : 300
-            },
-            "data" : { }
-          } ],
-          "subgraphEdges" : [ {
-            "id" : "w-e1",
-            "source" : "w-start",
-            "target" : "w-llm",
-            "edgeType" : "onCondition"
-          }, {
-            "id" : "w-e2",
-            "source" : "w-llm",
-            "target" : "w-exec",
-            "edgeType" : "onToolCall"
-          }, {
-            "id" : "w-e3",
-            "source" : "w-llm",
-            "target" : "w-finish",
-            "edgeType" : "onAssistantMessage"
-          }, {
-            "id" : "w-e4",
-            "source" : "w-exec",
-            "target" : "w-send",
-            "edgeType" : "onCondition"
-          }, {
-            "id" : "w-e5",
-            "source" : "w-send",
-            "target" : "w-exec",
-            "edgeType" : "onToolCall"
-          }, {
-            "id" : "w-e6",
-            "source" : "w-send",
-            "target" : "w-finish",
-            "edgeType" : "onAssistantMessage"
-          } ]
-        }
-      }, {
-        "id" : "sn-finish",
-        "type" : "node-finish",
-        "position" : {
-          "x" : 1520,
-          "y" : 320
-        },
-        "data" : { }
+      "maxReplanAttempts" : 3,
+      "maxIterations" : 30,
+      "inputKey" : "request",
+      "outputKey" : "report",
+      "goals" : [ {
+        "id" : "g-report",
+        "name" : "ReportSaved",
+        "priority" : 1,
+        "conditions" : [ {
+          "key" : "reportSaved",
+          "operator" : "equals",
+          "value" : true
+        } ]
       } ],
-      "strategyEdges" : [ {
-        "id" : "se-1",
-        "source" : "sn-start",
-        "target" : "sn-rate",
-        "edgeType" : "onCondition"
+      "initialState" : [ {
+        "key" : "request",
+        "value" : ""
       }, {
-        "id" : "se-5",
-        "source" : "sn-rate",
-        "target" : "sn-low",
-        "edgeType" : "onDecision",
-        "decisionValues" : [ "Niedrig" ]
+        "key" : "requirementsKnown",
+        "value" : false
       }, {
-        "id" : "se-6",
-        "source" : "sn-rate",
-        "target" : "sn-mid",
-        "edgeType" : "onDecision",
-        "decisionValues" : [ "Mittel" ]
+        "key" : "requirements",
+        "value" : ""
       }, {
-        "id" : "se-7",
-        "source" : "sn-rate",
-        "target" : "sn-high",
-        "edgeType" : "onDecision",
-        "decisionValues" : [ "Hoch" ]
+        "key" : "ticketTried",
+        "value" : false
       }, {
-        "id" : "se-8",
-        "source" : "sn-low",
-        "target" : "sn-write",
-        "edgeType" : "onCondition"
+        "key" : "scriptWritten",
+        "value" : false
       }, {
-        "id" : "se-9",
-        "source" : "sn-mid",
-        "target" : "sn-write",
-        "edgeType" : "onCondition"
+        "key" : "writeAttempts",
+        "value" : 0
       }, {
-        "id" : "se-10",
-        "source" : "sn-high",
-        "target" : "sn-write",
-        "edgeType" : "onCondition"
+        "key" : "devReport",
+        "value" : ""
       }, {
-        "id" : "se-11",
-        "source" : "sn-write",
-        "target" : "sn-finish",
-        "edgeType" : "onCondition"
+        "key" : "reviewDone",
+        "value" : false
+      }, {
+        "key" : "reviewPassed",
+        "value" : false
+      }, {
+        "key" : "reviewAttempts",
+        "value" : 0
+      }, {
+        "key" : "reviewFindings",
+        "value" : ""
+      }, {
+        "key" : "reportSaved",
+        "value" : false
+      }, {
+        "key" : "saveAttempts",
+        "value" : 0
+      }, {
+        "key" : "report",
+        "value" : ""
+      } ],
+      "actions" : [ {
+        "id" : "a-ticket",
+        "name" : "ReadTicket",
+        "description" : "Anforderungen aus dem Jira-Ticket lesen",
+        "preconditions" : [ {
+          "key" : "requirementsKnown",
+          "operator" : "equals",
+          "value" : false
+        }, {
+          "key" : "ticketTried",
+          "operator" : "equals",
+          "value" : false
+        } ],
+        "effects" : [ {
+          "key" : "ticketTried",
+          "value" : true
+        }, {
+          "key" : "requirementsKnown",
+          "value" : true
+        } ],
+        "cost" : 1,
+        "executor" : "ResearchAgent",
+        "inputTemplate" : "Anfrage des Nutzers:\n{{request}}\n\nLies das in der Anfrage genannte Jira-Ticket mit getIssue. Antworte im vorgegebenen Format.",
+        "outputKey" : "requirements",
+        "successContains" : "REQUIREMENTS_OK",
+        "onSuccess" : [ {
+          "key" : "ticketTried",
+          "value" : true
+        }, {
+          "key" : "requirementsKnown",
+          "value" : true
+        } ],
+        "onFailure" : [ {
+          "key" : "ticketTried",
+          "value" : true
+        } ]
+      }, {
+        "id" : "a-write",
+        "name" : "WriteScript",
+        "description" : "Skript schreiben und testen",
+        "preconditions" : [ {
+          "key" : "requirementsKnown",
+          "operator" : "equals",
+          "value" : true
+        }, {
+          "key" : "scriptWritten",
+          "operator" : "equals",
+          "value" : false
+        }, {
+          "key" : "writeAttempts",
+          "operator" : "lessThan",
+          "value" : 2
+        } ],
+        "effects" : [ {
+          "key" : "scriptWritten",
+          "value" : true
+        } ],
+        "cost" : 3,
+        "executor" : "DeveloperAgent",
+        "inputTemplate" : "Anforderungen aus dem Ticket:\n{{requirements}}\n\nSetze die Anforderungen als Bash-Skript um. Gehe genau so vor:\n1. Schreibe das Skript mit executeCommand: cat > <Dateiname> << 'EOF' (Skriptinhalt) EOF. Die Anfuehrungszeichen um 'EOF' sind Pflicht, sonst werden die $-Variablen ersetzt.\n2. executeCommand: chmod +x <Dateiname>\n3. Lege die Testdaten an, falls die Anforderungen welche nennen.\n4. Fuehre jeden Test aus den Akzeptanzkriterien mit executeCommand aus.\nSobald alle Tests die erwartete Ausgabe liefern, rufe kein Werkzeug mehr auf. Antworte erst danach mit dem Dateinamen und je Test dem Befehl mit seiner wortwoertlichen Ausgabe.",
+        "outputKey" : "devReport",
+        "successContains" : null,
+        "onSuccess" : [ {
+          "key" : "scriptWritten",
+          "value" : true
+        } ],
+        "onFailure" : [ {
+          "key" : "writeAttempts",
+          "value" : 1,
+          "op" : "increment"
+        } ]
+      }, {
+        "id" : "a-review",
+        "name" : "ReviewScript",
+        "description" : "Skript selbst testen und pruefen",
+        "preconditions" : [ {
+          "key" : "scriptWritten",
+          "operator" : "equals",
+          "value" : true
+        }, {
+          "key" : "reviewDone",
+          "operator" : "equals",
+          "value" : false
+        } ],
+        "effects" : [ {
+          "key" : "reviewDone",
+          "value" : true
+        }, {
+          "key" : "reviewPassed",
+          "value" : true
+        } ],
+        "cost" : 2,
+        "executor" : "ReviewAgent",
+        "inputTemplate" : "Anforderungen aus dem Ticket:\n{{requirements}}\n\nBericht des Entwicklers:\n{{devReport}}\n\nPruefe das Skript selbst und verlasse dich nicht auf den Bericht:\n1. executeCommand: cat <Dateiname>\n2. Fuehre jeden Test aus den Akzeptanzkriterien mit executeCommand aus. Lege fehlende Testdaten wie in den Anforderungen beschrieben an.\nAntworte genau in diesem Format. Die erste Zeile ist nur das Wort APPROVED, wenn jeder Test genau die erwartete Ausgabe liefert, sonst nur das Wort REJECTED. Danach je Test eine Zeile: Befehl | Ausgabe | ok oder falsch. Beispiel:\nAPPROVED\n./skript.sh a | erwartete Ausgabe | ok",
+        "outputKey" : "reviewFindings",
+        "successContains" : "APPROVED",
+        "onSuccess" : [ {
+          "key" : "reviewDone",
+          "value" : true
+        }, {
+          "key" : "reviewPassed",
+          "value" : true
+        } ],
+        "onFailure" : [ {
+          "key" : "reviewDone",
+          "value" : true
+        }, {
+          "key" : "reviewAttempts",
+          "value" : 1,
+          "op" : "increment"
+        } ]
+      }, {
+        "id" : "a-fix",
+        "name" : "FixScript",
+        "description" : "Skript anhand der Review-Befunde korrigieren",
+        "preconditions" : [ {
+          "key" : "reviewDone",
+          "operator" : "equals",
+          "value" : true
+        }, {
+          "key" : "reviewPassed",
+          "operator" : "equals",
+          "value" : false
+        }, {
+          "key" : "reviewAttempts",
+          "operator" : "lessThan",
+          "value" : 3
+        } ],
+        "effects" : [ {
+          "key" : "reviewDone",
+          "value" : false
+        } ],
+        "cost" : 3,
+        "executor" : "DeveloperAgent",
+        "inputTemplate" : "Anforderungen aus dem Ticket:\n{{requirements}}\n\nBefunde aus dem Review:\n{{reviewFindings}}\n\nBehebe die Befunde im Skript. Gehe genau so vor:\n1. executeCommand: cat <Dateiname>\n2. Schreibe die vollstaendige korrigierte Fassung mit executeCommand: cat > <Dateiname> << 'EOF' (Skriptinhalt) EOF. Die Anfuehrungszeichen um 'EOF' sind Pflicht, sonst werden die $-Variablen ersetzt.\n3. Fuehre jeden Test aus den Akzeptanzkriterien mit executeCommand aus.\nSobald alle Tests die erwartete Ausgabe liefern, rufe kein Werkzeug mehr auf. Antworte erst danach mit dem Dateinamen und je Test dem Befehl mit seiner wortwoertlichen Ausgabe.",
+        "outputKey" : "devReport",
+        "successContains" : null,
+        "onSuccess" : [ {
+          "key" : "reviewDone",
+          "value" : false
+        } ],
+        "onFailure" : [ {
+          "key" : "reviewDone",
+          "value" : false
+        } ]
+      }, {
+        "id" : "a-save",
+        "name" : "SaveReport",
+        "description" : "Bericht speichern",
+        "preconditions" : [ {
+          "key" : "reviewPassed",
+          "operator" : "equals",
+          "value" : true
+        }, {
+          "key" : "reportSaved",
+          "operator" : "equals",
+          "value" : false
+        }, {
+          "key" : "saveAttempts",
+          "operator" : "lessThan",
+          "value" : 2
+        } ],
+        "effects" : [ {
+          "key" : "reportSaved",
+          "value" : true
+        } ],
+        "cost" : 1,
+        "executor" : "ReviewAgent",
+        "inputTemplate" : "Anfrage des Nutzers:\n{{request}}\n\nSpeichere den Bericht: Rufe __write_file__ auf mit dem Pfad /workspace/sandbox/<TICKET-KEY>-report.md (Ticket-Key aus der Anfrage) und genau diesem Inhalt:\n\n# Bericht\n\n## Umsetzung\n\n{{devReport}}\n\n## Review\n\n{{reviewFindings}}\n\nAntworte erst nach dem erfolgreichen Werkzeugaufruf nur mit: SAVED <Pfad>",
+        "outputKey" : "report",
+        "successContains" : "SAVED",
+        "onSuccess" : [ {
+          "key" : "reportSaved",
+          "value" : true
+        } ],
+        "onFailure" : [ {
+          "key" : "saveAttempts",
+          "value" : 1,
+          "op" : "increment"
+        } ]
       } ]
-    },
-    "parent" : "harness"
-  }, {
-    "id" : "agent-reporter",
-    "type" : "agent",
-    "position" : {
-      "x" : 1008.61328125,
-      "y" : 239.943359375
-    },
-    "data" : {
-      "name" : "Reporter",
-      "systemPrompt" : "Du bekommst ein JSON-Array mit einem Eintrag je Ticket: {input, decisions, result oder error}. Schreibe einen kurzen deutschen Bericht: pro Ticket der Key, die Wichtigkeitsstufe (lies sie aus result im Format \"OK <KEY>: <Stufe>\") und, falls vorhanden, der Fehler.",
-      "modelProvider" : "ollama",
-      "modelId" : "qwen3.5:9b",
-      "temperature" : 0,
-      "ollamaThink" : false
     },
     "parent" : "harness"
   } ],
   "edges" : [ {
-    "id" : "e-jira-finder",
-    "source" : "node-jira-finder",
-    "target" : "agent-finder",
+    "id" : "e-jira",
+    "source" : "tool-jira",
+    "target" : "agent-research",
     "flowKind" : null,
     "decisionValues" : null
   }, {
-    "id" : "e-jira-rater",
-    "source" : "node-jira-rater",
-    "target" : "agent-rater",
+    "id" : "e-dev-shell",
+    "source" : "tool-dev-shell",
+    "target" : "agent-developer",
     "flowKind" : null,
     "decisionValues" : null
   }, {
-    "id" : "e-finder-rater",
-    "source" : "agent-finder",
-    "target" : "agent-rater",
-    "flowKind" : "forEach",
+    "id" : "e-review-fs",
+    "source" : "tool-review-fs",
+    "target" : "agent-review",
+    "flowKind" : null,
     "decisionValues" : null
   }, {
-    "id" : "e-rater-rep",
-    "source" : "agent-rater",
-    "target" : "agent-reporter",
-    "flowKind" : "collect",
+    "id" : "e-review-shell",
+    "source" : "tool-review-shell",
+    "target" : "agent-review",
+    "flowKind" : null,
+    "decisionValues" : null
+  }, {
+    "id" : "e-research",
+    "source" : "agent-research",
+    "target" : "planner",
+    "flowKind" : null,
+    "decisionValues" : null
+  }, {
+    "id" : "e-developer",
+    "source" : "agent-developer",
+    "target" : "planner",
+    "flowKind" : null,
+    "decisionValues" : null
+  }, {
+    "id" : "e-review",
+    "source" : "agent-review",
+    "target" : "planner",
+    "flowKind" : null,
     "decisionValues" : null
   } ],
   "otelConfig" : null
