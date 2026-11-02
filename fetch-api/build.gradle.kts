@@ -23,6 +23,4 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("ai.koog:koog-spring-boot-starter:1.3.0-beta")
     implementation("ai.koog:koog-agents:1.3.0")
-    implementation("ai.koog:agents-planner:1.3.0-beta")
-    implementation("ai.koog:agents-ext:1.3.0-beta")
 }

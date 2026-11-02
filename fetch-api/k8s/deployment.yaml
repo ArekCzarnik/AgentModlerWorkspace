@@ -1,28 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: goap-bash-script
+  name: fetch-api
   labels:
-    app: goap-bash-script
+    app: fetch-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: goap-bash-script
+      app: fetch-api
   template:
     metadata:
       labels:
-        app: goap-bash-script
+        app: fetch-api
     spec:
       containers:
-        - name: goap-bash-script
-          image: goap-bash-script:latest
+        - name: fetch-api
+          image: fetch-api:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: goap-bash-script-secrets
+                name: fetch-api-secrets
                 optional: true
           env:
             - name: OLLAMA_BASE_URL
