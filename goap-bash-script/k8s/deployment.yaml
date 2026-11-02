@@ -1,29 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: capital-expert
+  name: goap-bash-script
   labels:
-    app: capital-expert
+    app: goap-bash-script
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: capital-expert
+      app: goap-bash-script
   template:
     metadata:
       labels:
-        app: capital-expert
+        app: goap-bash-script
     spec:
       containers:
-        - name: capital-expert
-          image: capital-expert:latest
+        - name: goap-bash-script
+          image: goap-bash-script:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
-            - containerPort: 9101
           envFrom:
             - secretRef:
-                name: capital-expert-secrets
+                name: goap-bash-script-secrets
                 optional: true
           env:
             - name: OLLAMA_BASE_URL
