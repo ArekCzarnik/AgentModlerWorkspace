@@ -5,7 +5,7 @@
     "id" : "harness",
     "type" : "harness",
     "position" : {
-      "x" : 225.515625,
+      "x" : 225.79400898733948,
       "y" : 95.630859375
     },
     "data" : {
@@ -97,7 +97,7 @@
     "id" : "node-jira-finder",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 305.515625,
+      "x" : 305.79400898733945,
       "y" : 175.630859375
     },
     "data" : {
@@ -109,7 +109,7 @@
     "id" : "node-jira-rater",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 305.515625,
+      "x" : 305.79400898733945,
       "y" : 425.630859375
     },
     "data" : {
@@ -121,7 +121,7 @@
     "id" : "agent-finder",
     "type" : "agent",
     "position" : {
-      "x" : 625.515625,
+      "x" : 625.7940089873395,
       "y" : 225.630859375
     },
     "data" : {
@@ -138,7 +138,7 @@
     "id" : "agent-rater",
     "type" : "graph-agent",
     "position" : {
-      "x" : 925.515625,
+      "x" : 925.7940089873395,
       "y" : 325.630859375
     },
     "data" : {
@@ -369,7 +369,7 @@
     "id" : "agent-reporter",
     "type" : "agent",
     "position" : {
-      "x" : 1225.515625,
+      "x" : 1225.7940089873396,
       "y" : 325.630859375
     },
     "data" : {
