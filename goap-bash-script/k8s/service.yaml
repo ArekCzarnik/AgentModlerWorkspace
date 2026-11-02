@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fetch-api
+  name: goap-bash-script
   labels:
-    app: fetch-api
+    app: goap-bash-script
 spec:
   type: ClusterIP
   selector:
-    app: fetch-api
+    app: goap-bash-script
   ports:
     - name: port-8080
       port: 8080
