@@ -5,8 +5,8 @@
     "id" : "harness",
     "type" : "harness",
     "position" : {
-      "x" : 359.384765625,
-      "y" : 142.7109375
+      "x" : 356.923828125,
+      "y" : 153.392578125
     },
     "data" : {
       "name" : "jira-triage-graph",
@@ -33,8 +33,8 @@
     "id" : "node-jira-finder",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 431.216796875,
-      "y" : 289.484375
+      "x" : 428.755859375,
+      "y" : 300.166015625
     },
     "data" : {
       "toolType" : "jira",
