@@ -5,8 +5,8 @@
     "id" : "harness",
     "type" : "harness",
     "position" : {
-      "x" : 0.0,
-      "y" : -30.0
+      "x" : 225.515625,
+      "y" : 95.630859375
     },
     "data" : {
       "name" : "jira-triage-graph",
@@ -28,8 +28,8 @@
     "id" : "node-jira-finder",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 80.0,
-      "y" : 50.0
+      "x" : 305.515625,
+      "y" : 175.630859375
     },
     "data" : {
       "toolType" : "jira",
@@ -40,8 +40,8 @@
     "id" : "node-jira-rater",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 80.0,
-      "y" : 300.0
+      "x" : 305.515625,
+      "y" : 425.630859375
     },
     "data" : {
       "toolType" : "jira",
@@ -52,8 +52,8 @@
     "id" : "agent-finder",
     "type" : "agent",
     "position" : {
-      "x" : 400.0,
-      "y" : 100.0
+      "x" : 625.515625,
+      "y" : 225.630859375
     },
     "data" : {
       "name" : "TicketFinder",
@@ -69,8 +69,8 @@
     "id" : "agent-rater",
     "type" : "graph-agent",
     "position" : {
-      "x" : 700.0,
-      "y" : 200.0
+      "x" : 925.515625,
+      "y" : 325.630859375
     },
     "data" : {
       "name" : "TicketRater",
@@ -300,8 +300,8 @@
     "id" : "agent-reporter",
     "type" : "agent",
     "position" : {
-      "x" : 1000.0,
-      "y" : 200.0
+      "x" : 1225.515625,
+      "y" : 325.630859375
     },
     "data" : {
       "name" : "Reporter",
