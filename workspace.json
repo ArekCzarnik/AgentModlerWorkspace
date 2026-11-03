@@ -369,8 +369,8 @@
     "id" : "agent-reporter",
     "type" : "agent",
     "position" : {
-      "x" : 1225.7940089873396,
-      "y" : 325.4375
+      "x" : 1280.6963527373396,
+      "y" : 391.712890625
     },
     "data" : {
       "name" : "Reporter",
