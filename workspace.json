@@ -5,8 +5,8 @@
     "id" : "harness",
     "type" : "harness",
     "position" : {
-      "x" : 225.79400898733948,
-      "y" : 95.4375
+      "x" : -179.93091438298208,
+      "y" : 60.12080725841247
     },
     "data" : {
       "name" : "jira-triage-graph",
@@ -97,8 +97,8 @@
     "id" : "node-jira-finder",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 305.79400898733945,
-      "y" : 175.4375
+      "x" : -99.93091438298211,
+      "y" : 140.12080725841247
     },
     "data" : {
       "toolType" : "jira",
@@ -109,8 +109,8 @@
     "id" : "node-jira-rater",
     "type" : "builtin-tool",
     "position" : {
-      "x" : 325.9549037830496,
-      "y" : 535.3555213198767
+      "x" : -79.770019587272,
+      "y" : 500.03882857828927
     },
     "data" : {
       "toolType" : "jira",
@@ -121,8 +121,8 @@
     "id" : "agent-finder",
     "type" : "agent",
     "position" : {
-      "x" : 644.4004830224392,
-      "y" : 196.01529949357692
+      "x" : 238.6755596521176,
+      "y" : 160.69860675198942
     },
     "data" : {
       "name" : "TicketFinder",
@@ -138,8 +138,8 @@
     "id" : "agent-rater",
     "type" : "graph-agent",
     "position" : {
-      "x" : 925.7940089873395,
-      "y" : 325.4375
+      "x" : 520.0690856170177,
+      "y" : 290.1208072584125
     },
     "data" : {
       "name" : "TicketRater",
@@ -369,8 +369,8 @@
     "id" : "agent-reporter",
     "type" : "agent",
     "position" : {
-      "x" : 1280.6963527373396,
-      "y" : 391.712890625
+      "x" : 874.9714293670177,
+      "y" : 356.3961978834125
     },
     "data" : {
       "name" : "Reporter",
@@ -385,8 +385,8 @@
     "id" : "c8fb9cda-2955-4a7c-8d53-b9c2e788feea",
     "type" : "skill",
     "position" : {
-      "x" : 358.86825046061335,
-      "y" : 357.35640746350686
+      "x" : -46.85667290970821,
+      "y" : 322.03971472191944
     },
     "data" : {
       "name" : "brand-guidelines",
