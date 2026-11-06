@@ -17,10 +17,10 @@
       "height" : 632,
       "deployConfig" : {
         "namespace" : "agentweaver",
-        "registry" : "registry.k3s.home",
+        "registry" : "registry.agentswork.de",
         "ollamaUrl" : "",
         "replicas" : 1,
-        "skipTlsVerify" : true
+        "skipTlsVerify" : false
       },
       "skillRegistry" : {
         "url" : "https://github.com/anthropics/skills.git",
