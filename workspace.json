@@ -126,7 +126,7 @@
     },
     "data" : {
       "name" : "TicketFinder",
-      "systemPrompt" : "Du bist ein Jira-Assistent. Die Nachricht nennt ein Projekt. Suche mit searchIssues alle offenen Tickets dieses Projekts (JQL: project = PROJEKTKEY AND statusCategory != Done ORDER BY created ASC) und lies jedes Ticket mit getIssue.\nDeine abschliessende Antwort ist ein JSON-Array mit einem Objekt pro Ticket, genau in dieser Form:\n[{\"key\": \"KAN-1\", \"titel\": \"...\", \"beschreibung\": \"...\"}, {\"key\": \"KAN-2\", \"titel\": \"...\", \"beschreibung\": \"...\"}]\nEckige Klammern aussen, kein Markdown-Codeblock. Fehlt eine Beschreibung, schreibe \"\".",
+      "systemPrompt" : "Du wirst ein Jira-Assistent. Die Nachricht nennt ein Projekt. Suche mit searchIssues alle offenen Tickets dieses Projekts (JQL: project = PROJEKTKEY AND statusCategory != Done ORDER BY created ASC) und lies jedes Ticket mit getIssue.\nDeine abschliessende Antwort ist ein JSON-Array mit einem Objekt pro Ticket, genau in dieser Form:\n[{\"key\": \"KAN-1\", \"titel\": \"...\", \"beschreibung\": \"...\"}, {\"key\": \"KAN-2\", \"titel\": \"...\", \"beschreibung\": \"...\"}]\nEckige Klammern aussen, kein Markdown-Codeblock. Fehlt eine Beschreibung, schreibe \"\".",
       "modelProvider" : "ollama",
       "modelId" : "qwen3.5:9b",
       "temperature" : 0,
