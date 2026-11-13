@@ -13,8 +13,8 @@
       "backend" : "spring-boot",
       "port" : 8080,
       "dockerBaseImage" : "eclipse-temurin:21-jre",
-      "width" : 1619,
-      "height" : 632,
+      "width" : 1620,
+      "height" : 583,
       "deployConfig" : {
         "namespace" : "agentweaver",
         "registry" : "registry.agentswork.de",
